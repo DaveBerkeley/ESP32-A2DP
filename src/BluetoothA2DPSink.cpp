@@ -14,6 +14,8 @@
 // Copyright 2015-2016 Espressif Systems (Shanghai) PTE LTD
 
 
+//#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+
 #include "BluetoothA2DPSink.h"
 
 /**
@@ -180,7 +182,8 @@ int BluetoothA2DPSink::init_bluetooth()
     return false;
   }
   ESP_LOGI(BT_AV_TAG,"bluedroid enabled");
- 
+
+  return true;
 }
 
 bool BluetoothA2DPSink::app_work_dispatch(app_callback_t p_cback, uint16_t event, void *p_params, int param_len)
@@ -428,6 +431,7 @@ void  BluetoothA2DPSink::av_hdl_avrc_evt(uint16_t event, void *p_param)
         break;
     }
     case ESP_AVRC_CT_METADATA_RSP_EVT: {
+        // Text name for the current track
         ESP_LOGI(BT_AV_TAG, "AVRC metadata rsp: attribute id 0x%x, %s", rc->meta_rsp.attr_id, rc->meta_rsp.attr_text);
         free(rc->meta_rsp.attr_text);
         break;
@@ -479,6 +483,7 @@ void  BluetoothA2DPSink::av_hdl_stack_evt(uint16_t event, void *p_param)
 /* callback for A2DP sink */
 void  BluetoothA2DPSink::app_a2d_callback(esp_a2d_cb_event_t event, esp_a2d_cb_param_t *param)
 {
+    //ESP_LOGD(APP, "x%x, ", __func__);
     // lambda for callback
     auto av_hdl_a2d_evt_2=[](uint16_t event, void *p_param){
         ESP_LOGD(BT_AV_TAG, "%s", __func__);
