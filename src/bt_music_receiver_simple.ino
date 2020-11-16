@@ -15,10 +15,42 @@
 */
 
 #include <panglos/debug.h>
+#include <panglos/gpio.h>
 
 #include "BluetoothA2DPSink.h"
 
 #include "io.h"
+
+class GPIO : public panglos::GPIO
+{
+    int pin;
+
+    GPIO(int p) : pin(p) 
+    {
+        pinMode(pin, OUTPUT);
+    }
+
+public:
+    virtual ~GPIO() { }
+ 
+    virtual void set(bool state)
+    {
+        digitalWrite(pin, state ? HIGH : LOW);
+    }
+
+    virtual bool get() { return 0; }
+    virtual void toggle() {}
+
+    virtual void set_interrupt_handler(void (*fn)(void *arg), void *arg) {}
+    virtual void on_interrupt() {}
+
+    virtual bool flush() { return false; }
+
+    static panglos::GPIO* create(int pin)
+    {
+        return new GPIO(pin);
+    }
+};
 
    /*
     *
@@ -33,7 +65,7 @@ namespace panglos {
 
     timer_t timer_now()
     {
-        return 0;
+        return millis();
     }
 }
 
@@ -64,15 +96,24 @@ BluetoothA2DPSink a2dp_sink;
 
 static char bt_name[] = "xNAD-3020";
 
-void setup() {
-    a2dp_sink.start(bt_name);  
-    io_init(& a2dp_sink);
+#define LED_GREEN 2
+#define LED_BLUE  15
 
+static IoConfig io;
+
+void setup() {
     Serial.begin(115200);
+
+    io.green = GPIO::create(LED_GREEN);
+    io.blue  = GPIO::create(LED_BLUE);
+    io.sink = & a2dp_sink;
+
+    a2dp_sink.start(bt_name);  
+    io_init(& io);
 }
 
-
 void loop() {
+    io_poll();
 }
 
 
