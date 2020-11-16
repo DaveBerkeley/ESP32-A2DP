@@ -85,8 +85,12 @@ class BluetoothA2DPSink {
     esp_a2d_mct_t get_audio_type();
     void set_on_data_received(void (*callBack)());
 
+    void set_a2d_callback(void (*fn)(esp_a2d_cb_event_t event, esp_a2d_cb_param_t *param)) {
+        app_a2d_callback_fn = fn;
+    }
+
     /**
-     * Wrappbed methods called from callbacks
+     * Wrapped methods called from callbacks
      */
     void app_a2d_callback(esp_a2d_cb_event_t event, esp_a2d_cb_param_t *param);
     void app_rc_ct_callback(esp_avrc_ct_cb_event_t event, esp_avrc_ct_cb_param_t *param);
@@ -114,6 +118,8 @@ class BluetoothA2DPSink {
     esp_a2d_audio_state_t audio_state;
     esp_a2d_mct_t audio_type;
     void (*data_received)() = NULL;
+
+    void (*app_a2d_callback_fn)(esp_a2d_cb_event_t event, esp_a2d_cb_param_t *param);    
 
     // priate methods
     int init_bluetooth();
