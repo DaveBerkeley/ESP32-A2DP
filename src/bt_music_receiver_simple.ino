@@ -13,26 +13,24 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "BluetoothA2DPSink.h"
 
 #include <panglos/debug.h>
-#include <panglos/sprintf.h>
 
-class Output : public panglos::Output
-{
-    virtual int _putc(char c) {
-        Serial.print(c);
-        return 1;
-    }
-};
+#include "BluetoothA2DPSink.h"
 
-Output out;
+#include "io.h"
+
+   /*
+    *
+    */
 
 namespace panglos {
+
     void * get_task_id()
     {
         return 0;
     }
+
     timer_t timer_now()
     {
         return 0;
@@ -46,48 +44,35 @@ extern "C" void Error_Handler(void)
         ;
 }
 
+class Output : public panglos::Output
+{
+    virtual int _putc(char c) {
+        Serial.print(c);
+        return 1;
+    }
+};
+
+Output out;
+
 panglos::Output *err_uart = & out;
+
+   /*
+    *
+    */
 
 BluetoothA2DPSink a2dp_sink;
 
 static char bt_name[] = "xNAD-3020";
 
-void a2d_callback(esp_a2d_cb_event_t event, esp_a2d_cb_param_t *param) {
-
-    switch (event) {
-        case ESP_A2D_CONNECTION_STATE_EVT:
-            PO_ERROR("%s ESP_A2D_CONNECTION_STATE_EVT", __func__);
-            break;
-        case ESP_A2D_AUDIO_STATE_EVT:
-            PO_ERROR("%s ESP_A2D_AUDIO_STATE_EVT", __func__);
-            break;
-        case ESP_A2D_AUDIO_CFG_EVT: {
-            PO_ERROR("%s ESP_A2D_AUDIO_CFG_EVT", __func__);
-            break;
-        }
-        default : {
-            PO_ERROR("%s Bad Event", __func__);
-            break;
-        }
-    }
-}
-
 void setup() {
-    a2dp_sink.set_a2d_callback(a2d_callback);
     a2dp_sink.start(bt_name);  
+    io_init(& a2dp_sink);
 
     Serial.begin(115200);
 }
 
 
 void loop() {
-#if 0
-    static int i = 0;
-    Serial.print("hello world! ");
-    Serial.print(i++);
-    Serial.println("");
-    delay(1000);
-#endif
 }
 
 
