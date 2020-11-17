@@ -60,7 +60,7 @@ namespace panglos {
 
     void * get_task_id()
     {
-        return 0;
+        return xTaskGetCurrentTaskHandle();
     }
 
     timer_t timer_now()
@@ -96,8 +96,8 @@ BluetoothA2DPSink a2dp_sink;
 
 static char bt_name[] = "xNAD-3020";
 
-#define LED_GREEN 2
-#define LED_BLUE  15
+#define LED_GREEN 15
+#define LED_BLUE  2
 
 static IoConfig io;
 
